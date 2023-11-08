@@ -40,7 +40,7 @@ const Home: React.FC = () => {
   return (
     <div className="home-container home-page">
       <h1 className="mb-4">Home</h1>
-      <input type="file" onChange={handleFileUpload} accept=".ppt,.pptx" disabled={uploading} />
+      <input type="file" onChange={handleFileUpload} accept=".ppt,.pptx,.xlsx,.xls" disabled={uploading} />
       {uploading && <p>Converting file...</p>}
       <div className="list-file-content">
         <table className="table table-hover table-bordered table-striped">

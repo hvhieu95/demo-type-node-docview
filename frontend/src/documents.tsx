@@ -25,7 +25,7 @@ export const documents: DocumentType[] = [
   {
     id: "1",
     name: "file pdf",
-    uri: "http://localhost:3001/output/1699409073266_converted.pdf",
+    uri: " http://localhost:3001/output/1699427849674_converted.pdf",
  
     fileType: "pdf",
   },

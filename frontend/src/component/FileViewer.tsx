@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useCallback } from 'react';
 import DocViewer, { DocViewerRenderers } from "@cyntler/react-doc-viewer";
 import { DocumentType } from '../documents';
-
+import FileViewerComponent from 'react-file-viewer';
 const disableScrolling = (element: HTMLElement | null) => {
   const preventDefault = (e: Event) => e.preventDefault();
   if (element) {
@@ -30,14 +30,33 @@ const FileViewer: React.FC<FileViewerProps> = ({ document }) => {
 
  
 
-  return (
-    <div ref={viewerRef} className="file-viewer">
+  // Xác định loại viewer dựa trên loại file
+  const renderViewer = () => {
+    // Nếu là PDF, sử dụng react-file-viewer
+    if (document.fileType === 'pdf') {
+      return <FileViewerComponent fileType="pdf" filePath={document.uri} />;
+    }
+    // Nếu không phải là PDF, sử dụng react-doc-viewer
+    return (
       <DocViewer
         documents={[{ uri: document.uri, fileType: document.fileType }]}
         pluginRenderers={DocViewerRenderers}
-        config={{ header: { disableHeader: false, disableFileName: false, retainURLParams: false } }}
-        style={{ width: "100%", height: "100%" }}
+        config={{
+          header: {
+            disableHeader: false,
+            disableFileName: false,
+            retainURLParams: false
+          }
+        }}
+        style={{ width: '100%', height: '100%' }}
       />
+    );
+  };
+
+
+  return (
+    <div ref={viewerRef} className="file-viewer">
+   {renderViewer()}
     </div>
   );
 };
