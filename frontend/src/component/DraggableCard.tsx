@@ -6,6 +6,7 @@ import RichTextEditor from "./EditText";
 
 type ShapeType =
   | "circle"
+  | "rectangle"
   | "square"
   | "triangle"
   | "arrow"
@@ -38,6 +39,11 @@ const DraggableCard = React.memo(
 
     const shapeStyles: { [key in ShapeType]: React.CSSProperties } = {
       square: {},
+      rectangle: {
+        backgroundColor: "blue",
+        width: "100%",
+        height: "100%",
+      },
       circle: {
         borderRadius: "50%",
       },
@@ -62,6 +68,7 @@ const DraggableCard = React.memo(
       setShowResizeHandles(true);
     };
     const handleDrag = (e: any, data: any) => {
+      console.log("Dragging to", data.x, data.y);
       onUpdatePosition({ x: data.x, y: data.y });
     };
     const handleStop = () => {

@@ -6,16 +6,17 @@ import { useDocuments } from "../DocumentContext";
 import { useNavigate } from "react-router-dom";
 import FileViewer from "./FileViewer";
 import ShapesEditor from "./ShapesEditor";
-
-export type ShapeType = {
-  type:'circle' | 'square' | 'triangle' | 'arrow' |'Rhombus'| 'message';
-  position: { x: number; y: number };
-  size: { width: number; height: number };
-  text: string;
-  // rotateAngle: number; 
-};
-
-
+import { v4 as uuidv4 } from "uuid";
+import { ShapeType } from "../types/shapetypes";
+import { GroupType } from "../types/grouptypes";
+import {
+  addGroup,
+  removeGroup,
+  selectGroup,
+  updateGroup,
+} from "../actions/groupActions";
+import { useSelector, useDispatch } from "react-redux";
+import { RootState } from "../reducers/rootReducer";
 
 interface DocumentViewerProps {
   updateDocumentsState?: (updatedDocuments: DocumentType[]) => void;
@@ -32,6 +33,40 @@ const DocumentViewer = ({ updateDocumentsState }: DocumentViewerProps) => {
   const { documents: globalDocuments, setDocuments: setGlobalDocuments } =
     useDocuments();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const groups = useSelector((state: RootState) => state.group.groups);
+  const selectedGroupId = useSelector(
+    (state: RootState) => state.group.selectedGroupId
+  );
+
+  // Hàm thêm một group mới
+  const addNewGroup = () => {
+    const newGroupId = uuidv4();
+    const newGroup: GroupType = {
+      id: newGroupId,
+      name: `Comment ${groups.length + 1}`,
+      shapeIds: [],
+    };
+    dispatch(addGroup(newGroup));
+  };
+  // Hàm chọn một group
+  const SelectGroup = (groupId: string) => {
+    dispatch(selectGroup(groupId));
+  };
+
+  // hàm cập nhật văn bản cho mỗi nhóm
+  const updateGroupText = (groupId: string, newText: string) => {
+    dispatch(updateGroup(groupId, newText));
+  };
+  // hàm xóa 1 group
+  const handleRemoveGroup = (groupId: string) => {
+    dispatch(removeGroup(groupId));
+  };
+// hàm lấy các thẻ con từ thẻ cha
+  const selectedGroupShapes = shapes.filter(
+    (shape) => shape.groupId === selectedGroupId
+  );
 
   useEffect(() => {
     const foundDocument = globalDocuments.find((doc) => doc.id === id);
@@ -86,17 +121,44 @@ const DocumentViewer = ({ updateDocumentsState }: DocumentViewerProps) => {
     navigate(-1);
   };
 
-
-
   return (
     <>
       <div className={`viewer-with-draggable ${document.fileType}`}>
-        <div className="canvas">
+        <aside className="w-1/6 bg-blue-100 p-4 overflow-y-auto space-y-2">
+          <button
+            className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700"
+            onClick={addNewGroup}
+          >
+            Add Comment
+          </button>
+          {groups.map((group) => (
+            <div
+              key={group.id}
+              className="flex items-center border p-2 cursor-pointer bg-gray-100 rounded"
+              onClick={() => SelectGroup(group.id)}
+            >
+              <input
+                type="text"
+                value={group.text || group.name}
+                onChange={(e) => updateGroupText(group.id, e.target.value)}
+                className="w-full p-1"
+                placeholder="Nhập tên nhóm..."
+              />
+              <button onClick={() => handleRemoveGroup(group.id)}>Xóa</button>
+            </div>
+          ))}
+        </aside>
+
+        <div className="flex flex-col h-full w-4/6">
           <FileViewer document={document} />
         </div>
 
-        <div className="editor">
-          <ShapesEditor shapes={shapes} setShapes={setShapes} />
+        <div className="h-full w-1/6">
+          <ShapesEditor
+            shapes={selectedGroupShapes}
+            setShapes={setShapes}
+            groupId={selectedGroupId || ""}
+          />
 
           <Content
             comment={comment}
