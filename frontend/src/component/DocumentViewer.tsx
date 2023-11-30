@@ -1,14 +1,18 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import { DocumentType } from "../documents";
-import Content from "../component/Content";
+import Messages from "../component/Messages";
 import { useDocuments } from "../DocumentContext";
 import { useNavigate } from "react-router-dom";
 import FileViewer from "./FileViewer";
 import ShapesEditor from "./ShapesEditor";
+import RichTextEditor from "../component/TextEditor";
 import { v4 as uuidv4 } from "uuid";
 import { ShapeType } from "../types/shapetypes";
 import { GroupType } from "../types/grouptypes";
+import { faTrash } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { updateTextEditorContent } from "../actions/textEditorActions";
 import {
   addGroup,
   removeGroup,
@@ -34,7 +38,7 @@ const DocumentViewer = ({ updateDocumentsState }: DocumentViewerProps) => {
     useDocuments();
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
+  const content = useSelector((state: RootState) => state.textEditor.content);
   const groups = useSelector((state: RootState) => state.group.groups);
   const selectedGroupId = useSelector(
     (state: RootState) => state.group.selectedGroupId
@@ -45,13 +49,13 @@ const DocumentViewer = ({ updateDocumentsState }: DocumentViewerProps) => {
     const newGroupId = uuidv4();
     const newGroup: GroupType = {
       id: newGroupId,
-      name: `Comment ${groups.length + 1}`,
+      name: "",
       shapeIds: [],
     };
     dispatch(addGroup(newGroup));
   };
   // Hàm chọn một group
-  const SelectGroup = (groupId: string) => {
+  const HandleSelectGroup = (groupId: string) => {
     dispatch(selectGroup(groupId));
   };
 
@@ -67,7 +71,12 @@ const DocumentViewer = ({ updateDocumentsState }: DocumentViewerProps) => {
   const selectedGroupShapes = shapes.filter(
     (shape) => shape.groupId === selectedGroupId
   );
-
+  // hàm sửa text
+  const handleTextChange = (newContent: string) => {
+    if (selectedGroupId) {
+      dispatch(updateGroup(selectedGroupId, newContent));
+    }
+  };
   useEffect(() => {
     const foundDocument = globalDocuments.find((doc) => doc.id === id);
     if (foundDocument) {
@@ -124,9 +133,9 @@ const DocumentViewer = ({ updateDocumentsState }: DocumentViewerProps) => {
   return (
     <>
       <div className={`viewer-with-draggable ${document.fileType}`}>
-        <aside className="w-1/6 bg-blue-100 p-4 overflow-y-auto space-y-2">
+        <aside className=" w-1/6 bg-blue-100 p-4 overflow-y-auto space-y-2 flex-col">
           <button
-            className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700"
+            className=" mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700"
             onClick={addNewGroup}
           >
             Add Comment
@@ -135,32 +144,24 @@ const DocumentViewer = ({ updateDocumentsState }: DocumentViewerProps) => {
             <div
               key={group.id}
               className="flex items-center border p-2 cursor-pointer bg-gray-100 rounded"
-              onClick={() => SelectGroup(group.id)}
+              onClick={() => HandleSelectGroup(group.id)}
             >
               <input
                 type="text"
-                value={group.text || group.name}
+                value={group.name}
                 onChange={(e) => updateGroupText(group.id, e.target.value)}
-                className="w-full p-1"
-                placeholder="Nhập tên nhóm..."
+                className="border-none rounded-none focus:outline-none p-1 w-full"
+                placeholder={"Nhập comment..."}
               />
-              <button onClick={() => handleRemoveGroup(group.id)}>Xóa</button>
+
+              <FontAwesomeIcon
+                icon={faTrash}
+                className="text-red-500 hover:text-red-700 cursor-pointer ml-2"
+                onClick={() => handleRemoveGroup(group.id)}
+              />
             </div>
           ))}
-        </aside>
-
-        <div className="flex flex-col h-full w-4/6">
-          <FileViewer document={document} />
-        </div>
-
-        <div className="h-full w-1/6">
-          <ShapesEditor
-            shapes={selectedGroupShapes}
-            setShapes={setShapes}
-            groupId={selectedGroupId || ""}
-          />
-
-          <Content
+          <Messages
             comment={comment}
             assign={assign}
             status={status}
@@ -168,6 +169,28 @@ const DocumentViewer = ({ updateDocumentsState }: DocumentViewerProps) => {
             onChangeStatus={setStatus}
             onChangeComment={setComment}
           />
+        </aside>
+
+        <div className="flex flex-col h-full w-4/6">
+          <FileViewer document={document} />
+        </div>
+
+        <div className="flex h-full w-1/6">
+          <ShapesEditor
+            shapes={selectedGroupShapes}
+            setShapes={setShapes}
+            groupId={selectedGroupId || ""}
+          />
+
+          {selectedGroupId && (
+            <div className="fixed w-full bottom-20 ">
+              <RichTextEditor
+                text={content}
+                onTextChange={handleTextChange}
+                placeholder="Nhập nội dung của bạn ở đây..."
+              />
+            </div>
+          )}
         </div>
       </div>
 

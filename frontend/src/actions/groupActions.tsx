@@ -17,7 +17,7 @@ export const UPDATE_GROUP = 'UPDATE_GROUP';
   };
   export type SelectGroupAction = { 
     type:"SELECT_GROUP";
-    payload: string;
+    payload: string | null;
   };
   
   export type UpdateGroupAction = {
@@ -33,7 +33,7 @@ export const UPDATE_GROUP = 'UPDATE_GROUP';
     type: REMOVE_GROUP,
     payload: groupId,
   });
-  export const selectGroup = (groupId: string): SelectGroupAction => ({
+  export const selectGroup = (groupId: string | null): SelectGroupAction => ({
     type: SELECT_GROUP,
     payload: groupId,
   });

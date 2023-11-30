@@ -5,6 +5,7 @@ import storage from 'redux-persist/lib/storage'; // sử dụng localStorage
 import thunk from 'redux-thunk';
 import groupReducer from './reducers/groupReducer';
 import shapeReducer from './reducers/shapeReducer';
+import textEditorReducer from './reducers/textEditorReducer';
 
 // Cấu hình cho redux-persist
 const persistConfig = {
@@ -15,6 +16,7 @@ const persistConfig = {
 const rootReducer = combineReducers({
   group: groupReducer,
   shape: shapeReducer,
+  textEditor: textEditorReducer,
 });
 
 // Wrap rootReducer bằng persistReducer với cấu hình đã định nghĩa

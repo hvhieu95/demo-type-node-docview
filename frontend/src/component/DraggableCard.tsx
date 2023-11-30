@@ -2,7 +2,6 @@ import React, { useState, useRef } from "react";
 import Draggable from "react-draggable";
 import { ResizableBox } from "react-resizable";
 import "react-resizable/css/styles.css";
-import RichTextEditor from "./EditText";
 
 type ShapeType =
   | "circle"
@@ -18,7 +17,7 @@ type DraggableCardProps = {
   position: { x: number; y: number };
   onUpdatePosition: (position: { x: number; y: number }) => void;
   text: string;
-  onTextChange: (text: string) => void;
+
   size: { width: number; height: number };
   onResize: (size: { width: number; height: number }) => void;
 };
@@ -29,13 +28,11 @@ const DraggableCard = React.memo(
     position,
     onUpdatePosition,
     text,
-    onTextChange,
     size,
     onResize,
   }: DraggableCardProps) => {
     const [disableDragging, setDisableDragging] = useState<boolean>(false);
     const [showResizeHandles, setShowResizeHandles] = useState(false);
-    const [isEditing, setIsEditing] = useState(false);
 
     const shapeStyles: { [key in ShapeType]: React.CSSProperties } = {
       square: {},
@@ -95,19 +92,8 @@ const DraggableCard = React.memo(
       }
     };
 
-    const handleDoubleClick = () => {
-      setIsEditing(true);
-      setDisableDragging(true); // cho phép chỉnh sửa và ngăn ngừa kéo thả khi doupleclick
-    };
-
-    const handleMouseLeaveEditor = () => {
-      setIsEditing(false); // Tắt chế độ chỉnh sửa khi dời chuột
-      setDisableDragging(false); // đặt lại chế độ kéo thả khi edit xong
-    };
-
     return (
       <div
-        onDoubleClick={handleDoubleClick}
         className=" draggable-container"
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeaveShapes}
@@ -138,46 +124,7 @@ const DraggableCard = React.memo(
                 backgroundColor: "lightblue",
                 border: "none",
               }}
-            >
-              {isEditing ? (
-                // Sử dụng MyRichTextEditor khi đang trong chế độ chỉnh sửa
-                <div
-                  onMouseLeave={handleMouseLeaveEditor}
-                  style={{
-                    position: "absolute",
-                    top: "0",
-                    left: 0,
-                    width: "500px",
-                    height: "200px",
-                    zIndex: 1000,
-                  }}
-                >
-                  <RichTextEditor
-                    text={text}
-                    onTextChange={onTextChange}
-                    placeholder="Enter some text..."
-                  />
-                </div>
-              ) : (
-                //Render nội dung đã định dạng khi không chỉnh sửa
-                <div
-                  style={{
-                    ...shapeStyles[shape],
-                    backgroundColor: "lightblue",
-                    resize: "none",
-                    border: "none",
-                    outline: "none",
-                    flex: 1,
-                    textAlign: "center",
-                    padding: "30px",
-                    width: "100%",
-                    height: "100%",
-                    overflow: "hidden",
-                  }}
-                  dangerouslySetInnerHTML={{ __html: text }} // Sử dụng dangerouslySetInnerHTML để hiển thị HTML
-                />
-              )}
-            </ResizableBox>
+            ></ResizableBox>
           </div>
         </Draggable>
       </div>

@@ -1,4 +1,4 @@
-// RichTextEditor.tsx
+//TextEditor.tsx
 import React from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import { Editor } from "@tiptap/core";
@@ -20,6 +20,7 @@ interface RichTextEditorProps {
   text: string; // Initial content for the editor
   onTextChange: (text: string) => void; // Function to update content
   placeholder: string;
+  onBlur?:()=>void
 }
 interface Colour {
   value: string;
@@ -162,6 +163,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
   text,
   onTextChange,
   placeholder,
+  onBlur,
 }) => {
   const editor = useEditor({
     extensions: [
@@ -178,12 +180,13 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
     ],
     content: text,
     onUpdate: ({ editor }) => {
-      onTextChange(editor.getHTML());
+      const htmlContent = editor.getHTML();
+      onTextChange(htmlContent);
     },
   });
 
   return (
-    <div className="card">
+    <div className="card"  onBlur={onBlur}>
       <div className="card-body">
         {editor && <MenuBar editor={editor} placeholder={placeholder} />}
         <EditorContent editor={editor} />

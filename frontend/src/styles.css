@@ -113,50 +113,7 @@ footer {
 }
 
 
-.container-content{
-  height: 50%;
-  width: 20%;
-  position: fixed;
-  top: 50%;
-  z-index: 1000;
-  gap: 10px;
-  display: flex;
-  flex-direction: column;
-  background-color: white;
-  border: 1px solid #ccc;
-  bottom: 0; 
-  transform: translateY(-60px); 
-  flex: 1;
 
-}
-.select-container {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-}
-
-.select-container select {
-  margin-top: 10px;
-}
-.container-content-state {
-  display: flex;
-  flex-direction: row; 
-  align-items: center;
-  display: flex;
-  gap: 10px;
-}
-
-.container-content-state span {
-  margin-right: 20px;
-}
-
-
-.container-content-text {
-  display: flex;
-  flex-direction: column;
-  margin-top: 80%;
-
-}
 .home-container {
   background-color: #f8f9fa;
   border-radius: 8px;

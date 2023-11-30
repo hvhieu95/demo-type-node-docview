@@ -56,14 +56,7 @@ const handleaddShape = useCallback(
     [dispatch] 
   );
 
-  // hàm cập nhật text trong mỗi shape
-  const HandleUpdateShapeText = useCallback(
-    (shapeId: string, text: string) => {
-      // Gửi action cập nhật văn bản của shape
-      dispatch(updateShapeText(shapeId, text));
-    },
-    [dispatch] 
-  );
+ 
 
   // hàm cập nhật size của shape
   const HandleUpdatedShapeSize = useCallback(
@@ -94,7 +87,7 @@ const HandleRemoveShape = useCallback(
             size={shape.size}
             onResize={(size) => HandleUpdatedShapeSize(shape.id, size)}
             text={shape.text}
-            onTextChange={(newText) => updateShapeText(shape.id, newText)}
+            // onTextChange={(newText) => updateShapeText(shape.id, newText)}
             onRemove={() => HandleRemoveShape(shape.id)}
             onUpdatePosition={(position) =>
               onUpdateShapePosition(shape.id, position)
