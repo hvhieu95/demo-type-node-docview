@@ -9,7 +9,8 @@ import {
   Select,
   MenuItem,
   InputLabel,
-  FormControl,Box
+  FormControl,
+  Box,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 
@@ -20,6 +21,7 @@ type FormAssignType = {
   onChangeComment: (comment: string) => void;
   onChangeStatus: (status: string) => void;
   onChangeAssign: (assign: string) => void;
+  onSave: () => void;
 };
 
 const FormAssign = ({
@@ -29,29 +31,31 @@ const FormAssign = ({
   onChangeAssign,
   onChangeStatus,
   onChangeComment,
+  onSave,
 }: FormAssignType) => {
   return (
     <Card
       sx={{
         position: "fixed",
-        bottom: 16,
-        left: 16,
+        bottom: 10,
+        right: 10,
         zIndex: 50,
-        minWidth: 275,
+        maxWidth: 300,
         display: "flex",
         flexDirection: "column",
         p: 2,
         bgcolor: "background.paper",
         border: 1,
-        borderColor: "grey.300",
+        borderColor: "grey.100",
+        borderRadius: 2,
       }}
     >
       <CardContent>
         <FormControl fullWidth sx={{ mb: 2 }}>
           <TextField
             variant="outlined"
-            value={comment}
-            onChange={(e) => onChangeComment(e.target.value)}
+            value={assign}
+            onChange={(e) => onChangeAssign(e.target.value)}
             placeholder="Assigner"
             InputProps={{
               endAdornment: (
@@ -87,8 +91,13 @@ const FormAssign = ({
           }}
         >
           <Button size="small">Cancel</Button>
-          <Button size="small" variant="contained" color="primary">
-            Create
+          <Button
+            size="small"
+            variant="contained"
+            color="primary"
+            onClick={onSave}
+          >
+            Save
           </Button>
         </Box>
       </CardActions>

@@ -4,7 +4,8 @@ import { DocumentType } from "../documents";
 import { useDocuments } from "../DocumentContext";
 import { useNavigate } from "react-router-dom";
 import FileViewer from "../component/FileViewer";
-import ShapesEditor from "../component/ShapesEditor";
+import CreateaSubTask from "../component/CreateaSubTask";
+import { addShape } from "../actions/shapeActions";
 import { v4 as uuidv4 } from "uuid";
 import { ShapeType } from "../types/shapetypes";
 import { GroupType } from "../types/grouptypes";
@@ -14,18 +15,23 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import Popover from "@mui/material/Popover";
 import {
+  ExpandLess as ExpandLessIcon,
+  ExpandMore as ExpandMoreIcon,
+  WidthFull,
+} from "@mui/icons-material";
+import {
   List,
   ListItem,
   ListItemText,
   ListItemAvatar,
   Avatar,
   IconButton,
+  Box,
+  Collapse,
 } from "@mui/material";
 import Typography from "@mui/material/Typography";
-import SupervisedUserCircle from "@mui/icons-material/SupervisedUserCircle";
 import DeleteIcon from "@mui/icons-material/Delete";
 
-import { styled } from "@mui/material/styles";
 import {
   addGroup,
   removeGroup,
@@ -36,6 +42,12 @@ import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../reducers/rootReducer";
 import { CreateIcon, IconAvatarAssigner, IconCreateShape } from "../icons";
 import FormAssign from "../component/FormAssign";
+import SubMenu from "../component/subMenu";
+import SearchBar from "../component/searchBar";
+import { RootStateTask } from "../store";
+
+
+
 
 interface DocumentViewerProps {
   updateDocumentsState?: (updatedDocuments: DocumentType[]) => void;
@@ -49,6 +61,7 @@ const DocumentViewer = ({ updateDocumentsState }: DocumentViewerProps) => {
   const [comment, setComment] = useState<string>("");
   const [assign, setAssign] = useState<string>("");
   const [status, setStatus] = useState<string>("");
+  const [openMainTasks, setOpenMainTasks] = useState(true);
   const [popoverOpen, setPopoverOpen] = useState(false);
   const anchorRef = useRef(null);
   const [newGroupName, setNewGroupName] = useState("");
@@ -61,6 +74,8 @@ const DocumentViewer = ({ updateDocumentsState }: DocumentViewerProps) => {
   const selectedGroupId = useSelector(
     (state: RootState) => state.group.selectedGroupId
   );
+  const fileUrl = useSelector((state: RootStateTask) => state.tasks.currentFileUrl);
+
 
   // hàm mở , đóng Form Task
   const handleOpenPopover = () => {
@@ -104,6 +119,27 @@ const DocumentViewer = ({ updateDocumentsState }: DocumentViewerProps) => {
       dispatch(updateGroup(selectedGroupId, newContent));
     }
   };
+  // hàm tạo thẻ con từ thẻ cha
+  const handleAddShape = (shapeType: "rectangle") => {
+    const newShapeId = uuidv4();
+    const newShape = {
+      id: newShapeId,
+      groupId: selectedGroupId, // Đảm bảo shape được thêm vào nhóm đúng
+      type: shapeType,
+      position: { x: 0, y: 0 },
+      size: { width: 150, height: 100 },
+      text: "",
+    };
+
+    dispatch(addShape(newShape));
+  };
+
+  // hàm mở rộng xem list Task
+
+  const handleExpandMainTasks = () => {
+    setOpenMainTasks(!openMainTasks);
+  };
+
   useEffect(() => {
     const foundDocument = globalDocuments.find((doc) => doc.id === id);
     if (foundDocument) {
@@ -160,116 +196,185 @@ const DocumentViewer = ({ updateDocumentsState }: DocumentViewerProps) => {
   return (
     <>
       <div className={`viewer-with-draggable ${document.fileType}`}>
-        <aside className="flex items-center  w-1/6 bg-blue-100 p-4 overflow-y-auto space-y-2 flex-col">
-          <Button
-            ref={anchorRef}
-            variant="contained"
-            color="primary"
-            onClick={handleOpenPopover}
-          >
-            <CreateIcon />
-            Create Task
-          </Button>
-          <Popover
-            open={popoverOpen}
-            anchorEl={anchorRef.current}
-            onClose={handleClosePopover}
-            anchorOrigin={{
-              vertical: "bottom",
-              horizontal: "left",
-            }}
-          >
-            <DialogContent>
-              <TextField
-                autoFocus
-                margin="dense"
-                id="name"
-                label="Task"
-                type="text"
-                fullWidth
-                variant="outlined"
-                value={newGroupName}
-                onChange={(e) => setNewGroupName(e.target.value)}
-              />
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={handleClosePopover} color="primary">
-                Cancel
-              </Button>
-              <Button onClick={handleCreateNewGroup} color="primary">
-                Create
-              </Button>
-            </DialogActions>
-          </Popover>
-
-          <List sx={{ width: "100%", bgcolor: "background.paper" }}>
-            {groups.map((group) => (
-              <ListItem
-                className="border-b border-gray-200"
-                key={group.id}
-                alignItems="flex-start"
-                onClick={() => HandleSelectGroup(group.id)}
-              >
-                <ListItemAvatar>
-                  <Avatar>
-                    <IconAvatarAssigner />
-                  </Avatar>
-                </ListItemAvatar>
-                <ListItemText
-                  secondary={
-                    <React.Fragment>
-                      <Typography
-                        component="span"
-                        variant="body2"
-                        color="text.primary"
-                      >
-                        {`Today ${new Date().toLocaleTimeString("en-US", {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}`}
-                      </Typography>
-                    </React.Fragment>
-                  }
-                  primary={
-                    <input
-                      type="text"
-                      value={group.name}
-                      onChange={(e) =>
-                        updateGroupText(group.id, e.target.value)
-                      }
-                      className="border-none w-full focus:ring-0"
-                      placeholder="..."
-                      style={{ fontSize: "24px" }}
-                    />
-                  }
-                />
-                <IconButton>
-                  <IconCreateShape />
-                </IconButton>
-
-                <IconButton
-                  edge="end"
-                  aria-label="delete"
-                  onClick={() => handleRemoveGroup(group.id)}
-                >
-                  <DeleteIcon />
-                </IconButton>
-              </ListItem>
-            ))}
-          </List>
-        </aside>
-
-        <div className="flex flex-col h-full w-4/6">
-          <FileViewer document={document} />
+        <div className="w-1/6">
+          <SubMenu />
         </div>
 
-        <div className="flex h-full w-1/6">
-          <ShapesEditor
-            shapes={selectedGroupShapes}
-            setShapes={setShapes}
-            groupId={selectedGroupId || ""}
-          />
-          {/* 
+        <div className="w-5/6 flex flex-col">
+          <div className="sticky top-0 z-10">
+            <SearchBar />
+          </div>
+
+          <div className="flex flex-col  p-4">
+            <div className="border w-4/5 flex flex-col h-full ">
+              <FileViewer document={document}   />
+            </div>
+            <aside className="flex-none fixed  right-0  flex items-center  w-1/6 h-screen bg-blue-100 p-4 overflow-y-auto space-y-2 flex-col">
+              <Button
+                ref={anchorRef}
+                variant="contained"
+                color="primary"
+                onClick={handleOpenPopover}
+                className="w-full justify-start"
+              >
+                <CreateIcon />
+                Create Comment
+              </Button>
+              <Popover
+                open={popoverOpen}
+                anchorEl={anchorRef.current}
+                onClose={handleClosePopover}
+                anchorOrigin={{
+                  vertical: "bottom",
+                  horizontal: "left",
+                }}
+              >
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault(); // Ngăn chặn trình duyệt tự động submit form
+                    handleCreateNewGroup(); // Gọi hàm tạo group mới
+                  }}
+                >
+                  <DialogContent>
+                    <TextField
+                      autoFocus
+                      margin="dense"
+                      id="name"
+                      label="Task"
+                      type="text"
+                      fullWidth
+                      variant="outlined"
+                      value={newGroupName}
+                      onChange={(e) => setNewGroupName(e.target.value)}
+                    />
+                  </DialogContent>
+                  <DialogActions>
+                    <Button onClick={handleClosePopover} color="primary">
+                      Cancel
+                    </Button>
+                    <Button
+                      onClick={handleCreateNewGroup}
+                      variant="contained"
+                      color="primary"
+                    >
+                      Create
+                    </Button>
+                  </DialogActions>
+                </form>
+              </Popover>
+
+              <ListItem
+                button
+                onClick={handleExpandMainTasks}
+                className="gap-2"
+              >
+                <ListItemText primary="List" />
+                {openMainTasks ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+              </ListItem>
+              <Collapse in={openMainTasks} timeout="auto" unmountOnExit>
+                <List sx={{ width: "100%" }}>
+                  {groups.map((group) => (
+                    <Box
+                      key={group.id}
+                      onClick={() => HandleSelectGroup(group.id)}
+                  
+                      sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: 2,
+                        p: 2,
+                        border: "1px solid transparent",
+                        bgcolor: "white",
+                        '&:hover': {
+                          borderColor: "blue", 
+                        },
+                        borderRadius: 2,
+                        mb: 2,
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                        }}
+                      >
+                        <ListItemAvatar>
+                          <Avatar>
+                            <IconAvatarAssigner />
+                          </Avatar>
+                        </ListItemAvatar>
+                        <Typography
+                          variant="body2"
+                          color="text.primary"
+                          sx={{ flexGrow: 1 }}
+                        >
+                          {`Today ${new Date().toLocaleTimeString("en-US", {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}`}
+                        </Typography>
+                        <IconButton onClick={() => handleAddShape("rectangle")}>
+                          <IconCreateShape />
+                        </IconButton>
+                        <IconButton
+                          edge="end"
+                          aria-label="delete"
+                          onClick={() => handleRemoveGroup(group.id)}
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                      </Box>
+                      <TextField
+                        value={group.name}
+                        onChange={(e) =>
+                          updateGroupText(group.id, e.target.value)
+                        }
+                        size="small"
+                        variant="outlined"
+                        fullWidth
+                        placeholder="Enter task..."
+                        InputProps={{
+                          disableUnderline: true,
+                        }}
+                        sx={{
+                          "& .MuiOutlinedInput-root": {
+                            "& fieldset": {
+                              borderColor: "transparent", // Hide border when not focused
+                            },
+                            "&:hover fieldset": {
+                              borderColor: "transparent", // Hide border on hover
+                            },
+                            "&.Mui-focused fieldset": {
+                              borderColor: "primary.main", // Show border when focused
+                            },
+                          },
+                        }}
+                      />
+                    </Box>
+                  ))}
+                </List>
+              </Collapse>
+
+              <FormAssign
+                comment={comment}
+                assign={assign}
+                status={status}
+                onChangeAssign={setAssign}
+                onChangeStatus={setStatus}
+                onChangeComment={setComment}
+                onSave={handleSave}
+              />
+            </aside>
+          </div>
+        </div>
+        <CreateaSubTask
+          shapes={selectedGroupShapes}
+          setShapes={setShapes}
+          groupId={selectedGroupId || ""}
+          onAddShape={handleAddShape}
+        />
+        {/* 
           {selectedGroupId && (
             <div className="fixed w-full bottom-20 ">
               <RichTextEditor
@@ -279,24 +384,13 @@ const DocumentViewer = ({ updateDocumentsState }: DocumentViewerProps) => {
               />
             </div>
           )} */}
-        </div>
       </div>
-      <FormAssign
-        comment={comment}
-        assign={assign}
-        status={status}
-        onChangeAssign={setAssign}
-        onChangeStatus={setStatus}
-        onChangeComment={setComment}
-      />
+      {/* 
       <footer>
         <button className="button-backhome" onClick={handleBackHome}>
           Back
         </button>
-        <button className="button-save" onClick={handleSave}>
-          Save
-        </button>
-      </footer>
+      </footer> */}
     </>
   );
 };

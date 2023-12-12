@@ -6,6 +6,8 @@ import thunk from 'redux-thunk';
 import groupReducer from './reducers/groupReducer';
 import shapeReducer from './reducers/shapeReducer';
 import textEditorReducer from './reducers/textEditorReducer';
+import taskReducer from './slice/taskSlice';
+import { useDispatch } from 'react-redux';
 
 import arrowReducer from './reducers/arrowReduces';
 // Cấu hình cho redux-persist
@@ -19,12 +21,13 @@ const rootReducer = combineReducers({
   shape: shapeReducer,
   arrow: arrowReducer,
   textEditor: textEditorReducer,
+  tasks: taskReducer,
 });
 
 // Wrap rootReducer bằng persistReducer với cấu hình đã định nghĩa
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
-export type RootState = ReturnType<typeof rootReducer>;
+export type RootStateTask = ReturnType<typeof rootReducer>;
 
 // Tạo store với persistedReducer thay vì rootReducer trực tiếp
 const store = createStore(persistedReducer, applyMiddleware(thunk));
@@ -34,3 +37,8 @@ const persistor = persistStore(store);
 
 // Xuất khẩu cả store và persistor
 export { store, persistor };
+// Tạo loại AppDispatch dựa trên loại dispatch của store
+type AppDispatch = typeof store.dispatch;
+
+// Tạo custom hook để sử dụng dispatch với loại đã được chỉ rõ
+export const useAppDispatch = () => useDispatch<AppDispatch>();

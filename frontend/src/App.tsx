@@ -6,7 +6,7 @@ import {
   Navigate,
 } from "react-router-dom";
 import Home from "./pages/Home";
-import LoginPage from "./pages/Login";
+import Loginpage from "./pages/Login";
 import DocumentViewer from "./pages/DocumentViewer";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./styles.css";
@@ -25,9 +25,10 @@ const App = () => {
             <DocumentProvider>
               <Routes>
                 <Route path="/" element={<Navigate replace to="/login" />} />
-                <Route path="/login" element={<LoginPage />} />
+                <Route path="/login" element={<Loginpage />} />
                 <Route path="/home" element={<Home />} />
                 <Route path="/document/:id" element={<DocumentViewer />} />
+                <Route path="/task-file/:fileUrl" element={<DocumentViewer />} />
               </Routes>
             </DocumentProvider>
           </AuthProvider>

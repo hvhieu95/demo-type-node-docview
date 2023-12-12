@@ -6,11 +6,13 @@ import { ADD_GROUP, REMOVE_GROUP, SELECT_GROUP, UPDATE_GROUP } from '../actions/
 interface GroupState {
   groups: GroupType[];
   selectedGroupId: string | null;
+  
 }
 
 const initialState: GroupState = {
   groups: [],
   selectedGroupId: null,
+  
 };
 
 const groupReducer = (

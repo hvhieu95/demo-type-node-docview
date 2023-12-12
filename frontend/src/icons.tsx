@@ -15,6 +15,8 @@ import {ReactComponent as IconUploadSvg} from "./assets/icon_upload.svg"
 import {ReactComponent as IconConvertSvg} from "./assets/icon_convert.svg"
 import {ReactComponent as IconCreateShapeSvg}  from "./assets/Icons_createshape.svg"
 import {ReactComponent as IconAvatarAssignerSvg}  from "./assets/icon_assigner.svg"
+import {ReactComponent as IconVersionSvg}  from "./assets/Icon_version.svg"
+import {ReactComponent as IconTaskSvg}  from "./assets/Icon_task.svg"
 
 export const GridIcon = React.memo(() => <GridIconSvg  />);
 export const SearchIcon = React.memo(() => <SearchIconSvg  />);
@@ -22,11 +24,13 @@ export const SettingsIcon = React.memo(() => <SettingsIconSvg  />);
 export const UserIcon = React.memo(() => <UserIconSvg  />);
 export const CreateIcon = React.memo(() => <CreateIconSvg  />);
 export const SortIcon = React.memo(() => <SortIconSvg  />);
-export const RadioOpen = React.memo(() => <RadioOpenSvg  />); 
-export const RadioClose = React.memo(() => <RadioCloseSvg  />); 
-export const RadioDoing = React.memo(() => <RadioDoingSvg  />); 
-export const RadioCompleted = React.memo(() => <RadioCompletedSvg  />); 
 export const IconUpload = React.memo(() => <IconUploadSvg  />); 
 export const IconConvert = React.memo(() => <IconConvertSvg  />); 
 export const IconCreateShape = React.memo(() => <IconCreateShapeSvg  />); 
 export const IconAvatarAssigner = React.memo(() => <IconAvatarAssignerSvg  />); 
+export const IconVersion = React.memo(() => <IconVersionSvg  />); 
+export const IconTask = React.memo(() => <IconTaskSvg  />); 
+export const RadioOpen = React.memo((props: React.SVGProps<SVGSVGElement>) => <RadioOpenSvg {...props} />);
+export const RadioClose = React.memo((props: React.SVGProps<SVGSVGElement>) => <RadioCloseSvg {...props} />);
+export const RadioDoing = React.memo((props: React.SVGProps<SVGSVGElement>) => <RadioDoingSvg {...props} />);
+export const RadioCompleted = React.memo((props: React.SVGProps<SVGSVGElement>) => <RadioCompletedSvg {...props} />);
